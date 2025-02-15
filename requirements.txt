@@ -1,2 +1,1 @@
 kubernetes==32.0.0
-argcomplete>=2.0.0  

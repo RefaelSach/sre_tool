@@ -26,7 +26,7 @@ export KUBECONFIG=./kubeconfig
 
 ## Usage
 
-The tool provides two main commands: `list` and `scale`.
+The tool provides four main commands: `list`, `scale`, `info`, and `diagnostic`.
 
 ### Listing Deployments
 
@@ -50,20 +50,27 @@ Scale a deployment to a specified number of replicas:
 python3 sre_tool.py scale --replicas 5 --deployment test-deployment
 ```
 
-## Help
+### Retrieving Deployment Info
+
+Get detailed information about a specific deployment:
+
+```bash
+python3 sre_tool.py info --deployment failing-deployment --namespace default
+```
+
+### Running Diagnostic on Deployments
+
+Run diagnostics on a deployment:
+
+```bash
+python3 sre_tool.py diagnostic --deployment resource-deployment --namespace default
+```
+
+### Help
 
 To see all available options and commands:
 
 ```bash
 python3 sre_tool.py --help
 ```
-
-## Implementation Notes
-
-### `--namespace` Argument Functionality
-
-- When specified, the tool will display deployment info in the specified namespace.
-- If omitted, the tool will show info for the first deployment found in the cluster.
-
-This implementation choice was made based on initial requirements interpretation. Future versions may modify this behavior based on user feedback.
 

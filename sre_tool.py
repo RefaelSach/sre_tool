@@ -25,7 +25,7 @@ def check_kubernetes_connection():
         return False
 
 # list pod status
-def get_pods_status(namespace,replicaset_name):
+def get_pods_status(namespace,replicaset_name,pod_name):
     try:
         core_api = client.CoreV1Api()
         pods_list = core_api.list_namespaced_pod(namespace)
@@ -65,6 +65,7 @@ def get_pods_status(namespace,replicaset_name):
                     "containers": container_resources,
                     "start_time": pod.metadata.creation_timestamp.isoformat() if pod.metadata.creation_timestamp else None
                 }
+                if (pod.metadata.name == pod_name)
                 pods_data.append(pod_data)  
         return pods_data  
 
@@ -99,7 +100,6 @@ def list_deployments(api_instance, namespace):
             deployments = api_instance.list_deployment_for_all_namespaces()
         for deployment in deployments.items:
             output += "Namespace: %s, Name: %s, Replicas: %s \n" % (deployment.metadata.namespace,deployment.metadata.name, deployment.spec.replicas)
-            #print("Namespace: %s, Name: %s, Replicas: %s" % (deployment.metadata.namespace,deployment.metadata.name, deployment.spec.replicas))
         return output
     except Exception as e:
         print(f"Error when retriving deployments: {e}")
@@ -162,7 +162,7 @@ def retrieve_deployment_info(api_instance,deployment_name,namespace):
         return f"Error: {e}"
     
 #sre diagnostic - 
-def deployment_diagnostics(api_instance,deployment_name,namespace, pod):
+def deployment_diagnostics(api_instance,deployment_name,namespace, pod_name):
     try:
         #Retrieive deployment output from 'info' command function.
         deployment_output = retrieve_deployment_info(api_instance,deployment_name,namespace)
@@ -177,7 +177,7 @@ def deployment_diagnostics(api_instance,deployment_name,namespace, pod):
             if (rs.metadata.owner_references[0].kind == 'Deployment' and rs.metadata.owner_references[0].name == deployment_name):
                 replica_set_name = rs.metadata.name
                 
-        pod_status = get_pods_status(namespace,replica_set_name)
+        pod_status = get_pods_status(namespace,replica_set_name, pod_name)
         all_pod_outputs = []
         for pod in pod_status:
             container_info = []
@@ -185,10 +185,11 @@ def deployment_diagnostics(api_instance,deployment_name,namespace, pod):
                 container_image = f"{c['name']}({c['image']})"
                 if c.get('cpu_request') != 'N/A' or c.get('memory_request') != 'N/A':
                     container_str = f"[CPU: {c.get('cpu_request', 'N/A')}, Memory: {c.get('memory_request', 'N/A')}]"
+                    print(container_str)
                 container_info.append(container_str)
             container_info_str = ", ".join(container_info)
             conditions_str = ", ".join([f"{cond['type']}:{cond['status']}" for cond in pod['conditions']])
-
+            
             pod_output = f"Pod Info:\n"  
             pod_output += f"Name: {pod['name']}, Namespace: {pod['namespace']}\n"
             pod_output += f"Phase: {pod['phase']}, Reason: {pod.get('reason', 'N/A')}\n"
@@ -225,12 +226,12 @@ def main():
     scale_parser.add_argument('--namespace', type=str, help='Scale the deployment in the specified namespace')
 
     #info command
-    scale_parser = subparser.add_parser("info" ,help="scale deployments in a cluster")
+    scale_parser = subparser.add_parser("info" ,help="Shows information regarding a deployment in the cluster")
     scale_parser.add_argument('--deployment',required=True, type=str, help="Name of deployment")
     scale_parser.add_argument('--namespace',type=str, help='Namespace of the deployment')
     
     #diagnostic command
-    scale_parser = subparser.add_parser("diagnostic" ,help="scale deployments in a cluster")
+    scale_parser = subparser.add_parser("diagnostic" ,help="Show diagnose of a deployments and its corresponding resources (rs,pods)in a cluster")
     scale_parser.add_argument('--deployment',required=True, type=str, help="Name of deployment")
     scale_parser.add_argument('--namespace',type=str, help='Namespace of the deployment')
     scale_parser.add_argument('--pod',type=str, help='Name of a pod to Include pod-level diagnostics, such as pending, failed, or crash-looping pods.')
