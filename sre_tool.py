@@ -222,23 +222,26 @@ def main():
     scale_parser.add_argument('--pod',type=str, help='Name of a pod to Include pod-level diagnostics, such as pending, failed, or crash-looping pods.')
 
     args = parser.parse_args()
-    config.load_kube_config()
-    apps_v1 = client.AppsV1Api()
-    check_kubernetes_connection()
-    if args.command == "list":
-        result = list_deployments(apps_v1, args.namespace)
-    elif args.command == 'scale':
-        result = scale_deployment(apps_v1,args.deployment,args.namespace,args.replicas)
-    elif args.command == 'info':
-        result = retrieve_deployment_info(apps_v1,args.deployment,args.namespace)
-    elif args.command == 'diagnostic':
-        result = deployment_diagnostics(apps_v1,args.deployment,args.namespace,args.pod)
-    if 'Error' in result:
-        print(f"Failed to run command: {args.command} deployment")
-        print("-" * 50)
-        print(f"Error for devs: {result}")
-    else:
-        print(result)
+    try:
+        config.load_kube_config()
+        apps_v1 = client.AppsV1Api()
+        check_kubernetes_connection()
+        if args.command == "list":
+            result = list_deployments(apps_v1, args.namespace)
+        elif args.command == 'scale':
+            result = scale_deployment(apps_v1,args.deployment,args.namespace,args.replicas)
+        elif args.command == 'info':
+            result = retrieve_deployment_info(apps_v1,args.deployment,args.namespace)
+        elif args.command == 'diagnostic':
+            result = deployment_diagnostics(apps_v1,args.deployment,args.namespace,args.pod)
+        if 'Error' in result:
+            print(f"Failed to run command: {args.command} deployment")
+            print("-" * 50)
+            print(f"Error for devs: {result}")
+        else:
+            print(result)
+    except Exception as e:
+        print(f"Failing running tool {e}")
 
 if __name__ == '__main__':
     main()
