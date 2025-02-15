@@ -65,15 +65,10 @@ def get_pods_status(namespace,replicaset_name,pod_name):
                     "containers": container_resources,
                     "start_time": pod.metadata.creation_timestamp.isoformat() if pod.metadata.creation_timestamp else None
                 }
-                if (pod.metadata.name == pod_name)
                 pods_data.append(pod_data)  
         return pods_data  
 
-    except client.ApiException as e:
-        print(f"Error: {e}")
-        return f"Error: {e}"
     except Exception as e: 
-        print(f"Error: {e}")
         return f"Error: {e}"
     
 #  Locate a deployment's namespace function
@@ -102,7 +97,6 @@ def list_deployments(api_instance, namespace):
             output += "Namespace: %s, Name: %s, Replicas: %s \n" % (deployment.metadata.namespace,deployment.metadata.name, deployment.spec.replicas)
         return output
     except Exception as e:
-        print(f"Error when retriving deployments: {e}")
         return(f"Error when retriving deployments: {e}")
 
 #sre scale
@@ -132,7 +126,6 @@ def scale_deployment(api_instance,deployment_name,namespace,scale_number):
 
 
     except Exception as e:
-        print(f"Error when scaling deployment: {e}")
         return(f"Error when scaling deployment: {e}")
     
 #sre info
@@ -154,11 +147,7 @@ def retrieve_deployment_info(api_instance,deployment_name,namespace):
         
         output += "-" * 50 + "\n" 
         return output
-    except client.ApiException as e:
-        print(f"Error: {e}")
-        return f"Error: {e}"
     except Exception as e: 
-        print(f"Error: {e}")
         return f"Error: {e}"
     
 #sre diagnostic - 
@@ -202,12 +191,8 @@ def deployment_diagnostics(api_instance,deployment_name,namespace, pod_name):
         for i in all_pod_outputs:
             output += i
         return output
-    
-    except client.ApiException as e:
-        print(f"Error: {e}")
-        return f"Error: {e}"
+
     except Exception as e: 
-        print(f"Error: {e}")
         return f"Error: {e}"
 
 
@@ -248,7 +233,12 @@ def main():
         result = retrieve_deployment_info(apps_v1,args.deployment,args.namespace)
     elif args.command == 'diagnostic':
         result = deployment_diagnostics(apps_v1,args.deployment,args.namespace,args.pod)
-    print(result)
+    if 'Error' in result:
+        print(f"Failed to run command: {args.command} deployment")
+        print("-" * 50)
+        print(f"Error for devs: {result}")
+    else:
+        print(result)
 
 if __name__ == '__main__':
     main()
