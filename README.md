@@ -88,6 +88,3 @@ To see all available options and commands:
 python3 sre_tool.py --help  # For v1
 python3 main.py --help      # For v2
 ```
-
-This structure lets you choose whether to work with the legacy version or take advantage of the newer, more maintainable codebase. Let me know if you’d like any adjustments! 🚀
-
