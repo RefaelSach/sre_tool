@@ -2,6 +2,15 @@
 
 A command-line tool for managing Kubernetes deployments built with Python.
 
+## Versions
+
+There are two versions of the tool available:
+
+- **sre_tool_v1:** The older version with unstructured code, no logging, and fewer best practices applied.
+- **sre_tool_v2:** The newer version with improved structure, logging, and better adherence to best practices, making the code easier to read and maintain.
+
+The way to run the tool remains the same for both versions, but for `sre_tool_v2`, use `main.py` instead of `sre_tool.py`.
+
 ## Prerequisites
 
 Before using this tool, ensure you have:
@@ -33,13 +42,15 @@ The tool provides four main commands: `list`, `scale`, `info`, and `diagnostic`.
 List all deployments in the cluster:
 
 ```bash
-python3 sre_tool.py list
+python3 sre_tool.py list  # For v1
+python3 main.py list      # For v2
 ```
 
 List deployments in a specific namespace:
 
 ```bash
-python3 sre_tool.py list --namespace default
+python3 sre_tool.py list --namespace default  # For v1
+python3 main.py list --namespace default      # For v2
 ```
 
 ### Scaling Deployments
@@ -47,7 +58,8 @@ python3 sre_tool.py list --namespace default
 Scale a deployment to a specified number of replicas:
 
 ```bash
-python3 sre_tool.py scale --replicas 5 --deployment test-deployment
+python3 sre_tool.py scale --replicas 5 --deployment test-deployment  # For v1
+python3 main.py scale --replicas 5 --deployment test-deployment      # For v2
 ```
 
 ### Retrieving Deployment Info
@@ -55,7 +67,8 @@ python3 sre_tool.py scale --replicas 5 --deployment test-deployment
 Get detailed information about a specific deployment:
 
 ```bash
-python3 sre_tool.py info --deployment failing-deployment --namespace default
+python3 sre_tool.py info --deployment failing-deployment --namespace default  # For v1
+python3 main.py info --deployment failing-deployment --namespace default      # For v2
 ```
 
 ### Running Diagnostic on Deployments
@@ -63,7 +76,8 @@ python3 sre_tool.py info --deployment failing-deployment --namespace default
 Run diagnostics on a deployment:
 
 ```bash
-python3 sre_tool.py diagnostic --deployment resource-deployment --namespace default
+python3 sre_tool.py diagnostic --deployment resource-deployment --namespace default  # For v1
+python3 main.py diagnostic --deployment resource-deployment --namespace default      # For v2
 ```
 
 ### Help
@@ -71,6 +85,9 @@ python3 sre_tool.py diagnostic --deployment resource-deployment --namespace defa
 To see all available options and commands:
 
 ```bash
-python3 sre_tool.py --help
+python3 sre_tool.py --help  # For v1
+python3 main.py --help      # For v2
 ```
+
+This structure lets you choose whether to work with the legacy version or take advantage of the newer, more maintainable codebase. Let me know if you’d like any adjustments! 🚀
 
