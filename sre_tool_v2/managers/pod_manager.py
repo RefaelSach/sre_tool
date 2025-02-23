@@ -37,8 +37,7 @@ class PodManager:
                 timeout_seconds=self.timeout
             )
             pods_data = []
-            
-            # Get node metrics for resource usage calculation
+
             try:
                 metrics_api = client.CustomObjectsApi()
                 node_metrics = metrics_api.list_cluster_custom_object(
@@ -55,23 +54,19 @@ class PodManager:
                 metrics_available = False
                 
             for pod in pods_list.items:
-                # Skip if pod doesn't have owner references
+
                 if not pod.metadata.owner_references:
                     continue
                     
-                # Filter by replicaset name if provided
                 if (pod.metadata.owner_references[0].kind == 'ReplicaSet' and 
                     pod.metadata.owner_references[0].name == replicaset_name):
                     
-                    # Filter by pod name if provided
                     if pod_name and pod_name != pod.metadata.name:
                         continue
                     
-                    # Process container statuses
                     container_statuses = pod.status.container_statuses or []
                     conditions = pod.status.conditions or []
                     
-                    # Get container reasons
                     container_reasons = []
                     for container_status in container_statuses:
                         if container_status.state.waiting:
@@ -79,13 +74,11 @@ class PodManager:
                         elif container_status.state.terminated:
                             container_reasons.append(container_status.state.terminated.reason)
                     
-                    # Get container resources
                     container_resources = []
                     for container in pod.spec.containers:
                         requests = container.resources.requests or {}
                         limits = container.resources.limits or {}
                         
-                        # Initialize resource data
                         resource_data = {
                             "name": container.name,
                             "image": container.image,
@@ -99,7 +92,6 @@ class PodManager:
                             "memory_usage_percentage": "N/A"
                         }
                         
-                        # Add usage metrics if available
                         if metrics_available:
                             try:
                                 for item in pod_metrics.get('items', []):
@@ -109,7 +101,6 @@ class PodManager:
                                                 cpu_usage = container_metric['usage']['cpu']
                                                 memory_usage = container_metric['usage']['memory']
                                                 
-                                                # Calculate percentages if requests are available
                                                 if 'cpu' in requests and requests['cpu'] != "N/A":
                                                     try:
                                                         request_cpu = convert_cpu_to_cores(requests['cpu'])
@@ -135,7 +126,6 @@ class PodManager:
                         
                         container_resources.append(resource_data)
                     
-                    # Create pod data entry
                     pod_data = {
                         "name": pod.metadata.name,
                         "namespace": pod.metadata.namespace,

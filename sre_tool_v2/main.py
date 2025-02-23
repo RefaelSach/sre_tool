@@ -9,7 +9,7 @@ from managers.deployment_manager import DeploymentManager
 from managers.pod_manager import PodManager
 from managers.diagnostics_manager import DiagnosticsManager
 
-# Configure logging
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -19,7 +19,6 @@ logger = logging.getLogger("sre-tool")
 def main():
     """Main entry point for the CLI tool"""
     
-    # Set up argument parser
     parser = argparse.ArgumentParser(
         prog='sre_tool',
         description="A simple CLI tool that helps manage Kubernetes resources without direct kubectl usage"
@@ -88,7 +87,6 @@ def main():
             parser.print_help()
             return
         
-        # Output results
         if 'Error' in result:
             logger.error(f"Failed to run command: {args.command}")
             print("-" * 50)

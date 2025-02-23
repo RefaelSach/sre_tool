@@ -90,16 +90,13 @@ class DeploymentManager:
             str: Result message
         """
         try:
-            # Find namespace if not provided
             if not namespace:
                 namespace = self.locate_deployment_namespace(deployment_name)
                 if "not found" in namespace or "Exception" in namespace:
                     return namespace
-            
-            # Prepare scale body
+                
             scale_body = {'spec': {'replicas': scale_number}}
             
-            # Apply scale operation
             self.apps_api.patch_namespaced_deployment_scale(
                 deployment_name, 
                 namespace, 
@@ -108,18 +105,15 @@ class DeploymentManager:
             )
             logger.info(f"Scaling {deployment_name} in namespace {namespace} to {scale_number} replicas")
             
-            # Monitor scaling progress with timeout
-            max_wait_time = 120  # 2 minutes timeout
+            max_wait_time = 120 
             start_time = time.time()
             
             while True:
-                # Check if we've exceeded the timeout
                 if time.time() - start_time > max_wait_time:
                     warning_msg = f"Scaling operation timed out after {max_wait_time} seconds"
                     logger.warning(warning_msg)
                     return f"Partially scaled {deployment_name}. {warning_msg}"
                 
-                # Get current status
                 read_scale_request = self.apps_api.read_namespaced_deployment_scale(
                     deployment_name,
                     namespace,
@@ -132,7 +126,7 @@ class DeploymentManager:
                     break
                     
                 logger.debug(f"Current replicas: {current_replicas}, target: {scale_number}")
-                time.sleep(2)  # Wait before checking again
+                time.sleep(2) 
             
             return f"Successfully scaled {deployment_name} to {scale_number} replicas"
             
@@ -171,19 +165,18 @@ class DeploymentManager:
                 deployment = result.items[0]
                 logger.info(f"No specific deployment requested, showing first found: {deployment.metadata.name}")
             
-            # Format the output
+
             output = "Deployment Info:\n"
             output += f"Name: {deployment.metadata.name}, Namespace: {deployment.metadata.namespace}\n"
             output += f"Replicas: Desired={deployment.spec.replicas}, "
             output += f"Ready={deployment.status.ready_replicas if deployment.status.ready_replicas is not None else 0}, "
             output += f"Available={deployment.status.available_replicas if deployment.status.available_replicas is not None else 0}\n"
             
-            # Container details
+
             output += "Containers:\n"
             for container in deployment.spec.template.spec.containers:
                 output += f"  {container.name} ({container.image})\n"
                 
-                # Resource requests and limits
                 requests = container.resources.requests or {}
                 limits = container.resources.limits or {}
                 
