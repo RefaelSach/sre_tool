@@ -64,7 +64,8 @@ class DeploymentManager:
                 logger.info(f"Listing deployments in namespace: {namespace}")
             else:
                 deployments = self.apps_api.list_deployment_for_all_namespaces(
-                    timeout_seconds=self.timeout
+                    timeout_seconds=self.timeout,
+                    limit= 30
                 )
                 logger.info("Listing deployments across all namespaces")
                 
