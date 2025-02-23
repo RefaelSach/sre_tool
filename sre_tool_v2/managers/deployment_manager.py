@@ -101,7 +101,7 @@ class DeploymentManager:
                 deployment_name, 
                 namespace, 
                 scale_body,
-                timeout_seconds=self.timeout
+               #timeout_seconds=self.timeout
             )
             logger.info(f"Scaling {deployment_name} in namespace {namespace} to {scale_number} replicas")
             
@@ -117,7 +117,7 @@ class DeploymentManager:
                 read_scale_request = self.apps_api.read_namespaced_deployment_scale(
                     deployment_name,
                     namespace,
-                    timeout_seconds=self.timeout
+                    #timeout_seconds=self.timeout
                 )
                 current_replicas = read_scale_request.status.replicas
                 
