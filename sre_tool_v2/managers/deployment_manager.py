@@ -152,10 +152,10 @@ class DeploymentManager:
         """
         try:
             if namespace:
-                deployment = self.apps_api.read_namespaced_deployment_status(
+                deployment = self.apps_api.read_namespaced_deployment(
                     deployment_name,
                     namespace,
-                    timeout_seconds=self.timeout
+        
                 )
                 logger.info(f"Retrieving info for deployment {deployment_name} in namespace {namespace}")
             else:
